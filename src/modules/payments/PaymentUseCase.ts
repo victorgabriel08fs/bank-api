@@ -1,6 +1,7 @@
 import { Payment } from "@prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
+import { UseCase } from "../UseCase";
 import { CreatePaymentDTO } from "./dtos/CreatePaymentDTO";
 import { DeletePaymentDTO } from "./dtos/DeletePaymentDTO";
 import { FindPaymentDTO } from "./dtos/FindPaymentDTO";
@@ -60,8 +61,8 @@ export class PaymentUseCase {
         const payment = await prisma.payment.findUnique({
             where: {
                 id
-            },include:{
-                customer:true
+            }, include: {
+                customer: true
             }
         });
 
@@ -72,6 +73,39 @@ export class PaymentUseCase {
         return payment;
     }
 
-    
+    async reportPayment({ id, status }) {
+        const payment = await prisma.payment.findUnique({
+            where: id
+        });
+
+        if (!payment) {
+            throw new AppError("Payment does not exists!");
+        }
+
+        var s = "CANCELED";
+        var r = null;
+
+        if (status) {
+            r = Date.now();
+            switch (payment.status) {
+                case ("PENDING"):
+                    s = "RECEIVED";
+                    break;
+                case ("OVERDUE"):
+                    s = "RECEIVED_OVERDUE";
+                    break;
+            }
+        }
+
+        await prisma.payment.update({
+            data: {
+                status: s,
+                receivedDate: r
+            },
+            where: {
+                id
+            }
+        });
+    }
 
 }

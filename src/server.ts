@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 
 import { routes } from './routes';
 import { AppError } from "./errors/AppError";
+import { HandleEvents } from "./events/HandleEvents";
 
 const app = express();
 
@@ -25,4 +26,5 @@ app.use((err: Error, request: Request, response: Response, next: NextFunction) =
 
 app.listen(process.env.PORT, () => {
     console.log("Servidor rodando na porta " + process.env.PORT);
+    setInterval(() => { const handleEvents = new HandleEvents(); handleEvents.updateDueDate() }, 60000);
 })
