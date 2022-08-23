@@ -1,7 +1,6 @@
 import { Payment } from "@prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
-import { UseCase } from "../UseCase";
 import { CreatePaymentDTO } from "./dtos/CreatePaymentDTO";
 import { DeletePaymentDTO } from "./dtos/DeletePaymentDTO";
 import { FindPaymentDTO } from "./dtos/FindPaymentDTO";
