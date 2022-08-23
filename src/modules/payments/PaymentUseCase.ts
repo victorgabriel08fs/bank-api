@@ -47,11 +47,7 @@ export class PaymentUseCase {
     }
 
     async list(): Promise<Payment[]> {
-        const payments = await prisma.payment.findMany({
-            include:{
-                customer:true
-            }
-        });
+        const payments = await prisma.payment.findMany();
 
         if (!payments) {
             throw new AppError("Does not exists payments!");
@@ -64,6 +60,8 @@ export class PaymentUseCase {
         const payment = await prisma.payment.findUnique({
             where: {
                 id
+            },include:{
+                customer:true
             }
         });
 
@@ -73,5 +71,7 @@ export class PaymentUseCase {
 
         return payment;
     }
+
+    
 
 }

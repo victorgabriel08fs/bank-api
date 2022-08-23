@@ -10,7 +10,7 @@ export class CustomerUseCase {
 
         const customerAlreadyExists = await prisma.customer.findFirst({
             where: {
-                email,userId
+                email, userId
             }
         });
         if (customerAlreadyExists) {
@@ -60,6 +60,9 @@ export class CustomerUseCase {
         const customer = await prisma.customer.findUnique({
             where: {
                 id
+            }, include: {
+                payments: true,
+                user:true
             }
         });
 

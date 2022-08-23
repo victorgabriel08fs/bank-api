@@ -6,6 +6,7 @@ import { DeleteUserDTO } from "./dtos/DeleteUserDTO";
 import { FindUserDTO } from "./dtos/FindUserDTO";
 
 export class UserUseCase {
+
     async create({ name, email, password, cpfCnpj, adress }: CreateUserDTO): Promise<User> {
 
         const userAlreadyExists = await prisma.user.findUnique({
@@ -60,6 +61,8 @@ export class UserUseCase {
         const user = await prisma.user.findUnique({
             where: {
                 id
+            }, include: {
+                customers: true
             }
         });
 
@@ -69,5 +72,7 @@ export class UserUseCase {
 
         return user;
     }
+
+    
 
 }
