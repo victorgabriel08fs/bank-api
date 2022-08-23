@@ -13,8 +13,8 @@ export class PaymentUseCase {
                 id: customerId
             }
         });
-        if (customerAlreadyExists) {
-            throw new AppError("Customer already exists!");
+        if (!customerAlreadyExists) {
+            throw new AppError("Customer does not exists!");
         }
 
         const payment = await prisma.payment.create({
@@ -47,7 +47,11 @@ export class PaymentUseCase {
     }
 
     async list(): Promise<Payment[]> {
-        const payments = await prisma.payment.findMany();
+        const payments = await prisma.payment.findMany({
+            include:{
+                customer:true
+            }
+        });
 
         if (!payments) {
             throw new AppError("Does not exists payments!");

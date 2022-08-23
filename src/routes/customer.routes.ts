@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { UserController } from "../modules/users/UserController";
+import { CustomerController } from "../modules/customers/CustomerController";
 
-const userController = new UserController();
+const customerController = new CustomerController();
 
-const userRoutes = Router();
+const customerRoutes = Router();
 
-userRoutes.post("/", userController.create);
-userRoutes.get("/", userController.list);
-userRoutes.get("/:id", userController.find);
-userRoutes.delete("/:id", userController.delete);
+customerRoutes.post("/", customerController.create);
+customerRoutes.get("/", customerController.list);
+customerRoutes.get("/:id", customerController.find);
+customerRoutes.delete("/:id", customerController.delete);
 
-export { userRoutes };
+export { customerRoutes };

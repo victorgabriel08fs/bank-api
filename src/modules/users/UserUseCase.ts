@@ -10,7 +10,7 @@ export class UserUseCase {
 
         const userAlreadyExists = await prisma.user.findUnique({
             where: {
-                email,cpfCnpj
+                cpfCnpj
             }
         });
         if (userAlreadyExists) {

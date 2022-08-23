@@ -3,4 +3,4 @@ export interface CreatePaymentDTO{
     value:number,
     billingType:string,
     dueDate:string,
-}
+}   
