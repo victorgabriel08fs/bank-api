@@ -8,8 +8,7 @@ export class HandleEvents {
                 status: "PENDING"
             }
         });
-        
-        console.log("updating payments...");
+
         payments.map(async (payment) => {
             var now = new Date();
             const dif = moment(payment.dueDate).diff(moment(now));
@@ -24,5 +23,36 @@ export class HandleEvents {
                 });
             }
         });
+        console.log("updating payments...");
+    }
+
+    async updateCustomerStatus() {
+        const customers = await prisma.customer.findMany({
+            include: {
+                payments: true
+            }
+        });
+
+        customers.map(async (customer) => {
+            var status = "NON-DEFAULTING";
+            customer.payments.map((payment) => {
+                var now = new Date();
+                const dif = moment(now).diff(moment(payment.dueDate),'days');
+                if (payment.status == "OVERDUE"&&dif>1) {
+                    status = "DEFAULTING";
+                }
+            });
+
+            await prisma.customer.update({
+                data: {
+                    status
+                },
+                where: {
+                    id: customer.id
+                }
+            });
+        });
+        console.log("updating customers status...");
+
     }
 }
