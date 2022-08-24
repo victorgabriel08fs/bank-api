@@ -7,7 +7,7 @@ export class HandleEvents {
     async execute() {
         this.updateDueDate();
         this.updateCustomerStatus();
-        this.rate();
+        // this.rate();
     }
 
     async updateDueDate() {
