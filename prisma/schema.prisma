@@ -76,3 +76,10 @@ model Account {
 
   @@map("accounts")
 }
+
+model Rate {
+  id Int @id @default(autoincrement())
+  value Decimal
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
