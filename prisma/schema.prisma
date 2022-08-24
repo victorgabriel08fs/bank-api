@@ -22,6 +22,7 @@ model User {
   updated_at DateTime @updatedAt
 
   customers Customer[] @relation("user")
+  account   Account?   @relation("account")
 
   @@map("users")
 }
@@ -32,7 +33,7 @@ model Customer {
   name       String
   cpfCnpj    String
   adress     String?
-  status String @default("NON_DEFAULTING")
+  status     String   @default("NON_DEFAULTING")
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -45,17 +46,32 @@ model Customer {
 }
 
 model Payment {
-  id          String   @id @default(uuid())
-  customerId  String?
-  value       Decimal
-  billingType String
-  dueDate     DateTime
+  id           String    @id @default(uuid())
+  customerId   String?
+  value        Decimal
+  billingType  String
+  dueDate      DateTime
   receivedDate DateTime?
-  status String @default("PENDING")
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  status       String    @default("PENDING")
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
   customer Customer? @relation("customer", fields: [customerId], references: [id])
 
   @@map("payments")
+}
+
+model Account {
+  id         String   @id @default(uuid())
+  userId     String?  @unique
+  balance    Decimal  @default(0)
+  code       String
+  digit      String
+  password   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  owner User? @relation("account", fields: [userId], references: [id])
+
+  @@map("accounts")
 }

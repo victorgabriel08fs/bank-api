@@ -1,13 +1,14 @@
 import { User } from "@prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
+import { GenerateAccountData } from "../../services/GenerateAccountData";
 import { CreateUserDTO } from "./dtos/CreateUserDTO";
 import { DeleteUserDTO } from "./dtos/DeleteUserDTO";
 import { FindUserDTO } from "./dtos/FindUserDTO";
 
 export class UserUseCase {
 
-    async create({ name, email, password, cpfCnpj, adress }: CreateUserDTO): Promise<User> {
+    async create({ name, email, password, cpfCnpj, adress }: CreateUserDTO): Promise<any> {
 
         const userAlreadyExists = await prisma.user.findUnique({
             where: {
@@ -24,7 +25,16 @@ export class UserUseCase {
             }
         });
 
-        return user;
+        const generateAccountData = new GenerateAccountData();
+        const {code,digit} = (await generateAccountData.execute());
+
+        const account = await prisma.account.create({
+            data:{
+                userId:user.id,code,digit
+            }
+        });
+
+        return {user,account};
     }
 
     async delete({ id }: DeleteUserDTO): Promise<boolean> {
@@ -69,42 +79,31 @@ export class UserUseCase {
         if (!user) {
             throw new AppError("User does not exists");
         }
-
+        
         return user;
     }
-
+    
     async balance({ id }: FindUserDTO): Promise<any> {
-        var balance:decimal = 0.0;
-
         const user = await prisma.user.findUnique({
-            where: {
+            where:{
                 id
-            }, include: {
-                customers: true
+            },
+            include:{
+                account:true
             }
         });
-
-        if (!user) {
+        
+        if(!user){
             throw new AppError("User does not exists");
         }
+        
+        const account = user.account;
+        
+        if(!account){
+            throw new AppError("Account does not exists");
+        }
 
-        const customers = user.customers;
-        customers.map(async (customer) => {
-            const payments = await prisma.payment.findMany({
-                where: {
-                    customerId: customer.id,
-                    status: {
-                        contains: "RECEIVED"
-                    }
-                }
-            });
-
-            if(payments){
-                payments.map((payment)=>{
-                    balance = balance+(payment.value);
-                })
-            }
-        })
+        const balance = account.balance;
 
         return {balance};
     }
