@@ -68,6 +68,7 @@ model Account {
   code       String
   digit      String
   password   String?
+  status Boolean @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 

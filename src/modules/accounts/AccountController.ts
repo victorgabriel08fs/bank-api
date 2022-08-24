@@ -21,4 +21,14 @@ export class AccountController {
 
         return res.status(200).json(result);
     }
+
+    async changeStatus(req:Request,res:Response):Promise<any>{
+        const accountUseCase = new AccountUseCase();
+
+        const {id,status} = req.body;
+
+        const result = await accountUseCase.changeStatus({id,status});
+
+        return res.status(200).json(result);
+    }
 }

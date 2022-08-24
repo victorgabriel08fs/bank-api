@@ -10,5 +10,6 @@ accountRoutes.post("/", accountController.create);
 // accountRoutes.get("/:id", accountController.find);
 // accountRoutes.delete("/:id", accountController.delete);
 accountRoutes.get("/balance/:userId",accountController.balance);
+accountRoutes.patch("/change",accountController.changeStatus);
 
 export { accountRoutes };
