@@ -34,7 +34,7 @@ export class HandleEvents {
         });
 
         customers.map(async (customer) => {
-            var status = "NON-DEFAULTING";
+            var status = "NON_DEFAULTING";
             customer.payments.map((payment) => {
                 var now = new Date();
                 const dif = moment(now).diff(moment(payment.dueDate),'days');
@@ -43,14 +43,16 @@ export class HandleEvents {
                 }
             });
 
-            await prisma.customer.update({
-                data: {
-                    status
-                },
-                where: {
-                    id: customer.id
-                }
-            });
+            if(customer.status!=status){
+                await prisma.customer.update({
+                    data: {
+                        status
+                    },
+                    where: {
+                        id: customer.id
+                    }
+                });
+            }
         });
         console.log("updating customers status...");
 
