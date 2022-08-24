@@ -1,6 +1,7 @@
 import { prisma } from "../../prisma/client";
 import { CreateRateDTO } from "./dtos/CreateRateDTO";
 import { Rate } from '@prisma/client';
+import { AppError } from '../../errors/AppError';
 
 export class RateUseCase {
     async create({ value }: CreateRateDTO) {
@@ -21,5 +22,23 @@ export class RateUseCase {
         });
 
         return rate;
+    }
+
+    async change() {
+        const rateUseCase = new RateUseCase();
+        const lastRate = await rateUseCase.getLast();
+        if (!lastRate) {
+            throw new AppError("Rate does not exists");
+        }
+        const newRate = await prisma.rate.update({
+            data: {
+                status: !lastRate.status
+            },
+            where: {
+                id: lastRate.id
+            }
+        });
+        const status = newRate.status;
+        return { status };
     }
 }

@@ -48,8 +48,8 @@ export class AccountUseCase {
             throw new AppError("Account does not exists");
         }
 
-        const balance = account.balance;
-
+        const val = account.balance;
+        const balance = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val))
         return { balance };
     }
 

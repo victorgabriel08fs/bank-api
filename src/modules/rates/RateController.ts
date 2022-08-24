@@ -17,6 +17,14 @@ export class RateController {
 
         const result = await rateUseCase.getLast();
 
-        return result.status(200).json(result);
+        return res.status(200).json(result);
+    }
+
+    async change(req: Request, res: Response) {
+        const rateUseCase = new RateUseCase();
+
+        const result = await rateUseCase.change();
+
+        return res.status(200).json(result)
     }
 }

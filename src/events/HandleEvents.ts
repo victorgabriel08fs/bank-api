@@ -7,7 +7,7 @@ export class HandleEvents {
     async execute() {
         this.updateDueDate();
         this.updateCustomerStatus();
-        // this.rate();
+        this.rate();
     }
 
     async updateDueDate() {
@@ -74,7 +74,7 @@ export class HandleEvents {
         });
         const rateUseCase = new RateUseCase();
         const rate = await rateUseCase.getLast();
-        if (rate) {
+        if (rate&&rate.status) {
             accounts.map(async (account) => {
                 const value = Number(account.balance) + (Number(rate.value) * (Number(account.balance)));
                 await prisma.account.update({

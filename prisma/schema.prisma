@@ -80,6 +80,7 @@ model Account {
 model Rate {
   id Int @id @default(autoincrement())
   value Decimal
+  status Boolean @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
