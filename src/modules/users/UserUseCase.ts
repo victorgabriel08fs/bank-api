@@ -73,6 +73,42 @@ export class UserUseCase {
         return user;
     }
 
-    
+    async balance({ id }: FindUserDTO): Promise<Number> {
+        var balance:decimal = 0.0;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id
+            }, include: {
+                customers: true
+            }
+        });
+
+        if (!user) {
+            throw new AppError("User does not exists");
+        }
+
+        const customers = user.customers;
+        customers.map(async (customer) => {
+            const payments = await prisma.payment.findMany({
+                where: {
+                    customerId: customer.id,
+                    status: {
+                        contains: "RECEIVED"
+                    }
+                }
+            });
+
+            if(payments){
+                payments.map((payment)=>{
+                    balance = balance+(payment.value);
+                })
+            }
+        })
+
+        return balance;
+    }
+
+
 
 }

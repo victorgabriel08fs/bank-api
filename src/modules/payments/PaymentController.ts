@@ -40,4 +40,14 @@ export class PaymentController {
         return res.status(200).json(result);
     }
 
+    async reportPayment(req: Request, res: Response): Promise<any> {
+        const paymentUseCase = new PaymentUseCase();
+
+        const { id, status } = req.body;
+
+        const result = await paymentUseCase.reportPayment({ id, status });
+
+        return res.status(200).json(result);
+    }
+
 }

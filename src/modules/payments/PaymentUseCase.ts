@@ -72,9 +72,9 @@ export class PaymentUseCase {
         return payment;
     }
 
-    async reportPayment({ id, status }) {
+    async reportPayment({ id, status }): Promise<Payment> {
         const payment = await prisma.payment.findUnique({
-            where: id
+            where: { id }
         });
 
         if (!payment) {
@@ -85,7 +85,8 @@ export class PaymentUseCase {
         var r = null;
 
         if (status) {
-            r = Date.now();
+            r = new Date();
+
             switch (payment.status) {
                 case ("PENDING"):
                     s = "RECEIVED";
@@ -94,9 +95,10 @@ export class PaymentUseCase {
                     s = "RECEIVED_OVERDUE";
                     break;
             }
+            console.log(r);
         }
 
-        await prisma.payment.update({
+        const updatedPayment = await prisma.payment.update({
             data: {
                 status: s,
                 receivedDate: r
@@ -105,6 +107,8 @@ export class PaymentUseCase {
                 id
             }
         });
+        return updatedPayment;
+
     }
 
 }
