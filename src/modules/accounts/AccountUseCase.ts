@@ -28,7 +28,6 @@ export class AccountUseCase{
     }
 
     async balance({userId}){
-
         const user = await prisma.user.findUnique({
             where:{
                 id:userId

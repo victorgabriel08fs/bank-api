@@ -72,7 +72,8 @@ export class UserUseCase {
             where: {
                 id
             }, include: {
-                customers: true
+                customers: true,
+                account:true
             }
         });
 
@@ -83,31 +84,4 @@ export class UserUseCase {
         return user;
     }
     
-    async balance({ id }: FindUserDTO): Promise<any> {
-        const user = await prisma.user.findUnique({
-            where:{
-                id
-            },
-            include:{
-                account:true
-            }
-        });
-        
-        if(!user){
-            throw new AppError("User does not exists");
-        }
-        
-        const account = user.account;
-        
-        if(!account){
-            throw new AppError("Account does not exists");
-        }
-
-        const balance = account.balance;
-
-        return {balance};
-    }
-
-
-
 }

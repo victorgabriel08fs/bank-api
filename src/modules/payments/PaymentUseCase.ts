@@ -107,6 +107,39 @@ export class PaymentUseCase {
                 id
             }
         });
+
+        if (updatedPayment.status == "RECEIVED" || updatedPayment.status == "RECEIVED_OVERDUE") {
+            const customer = await prisma.customer.findUnique({ where: { id: updatedPayment.customerId }, include: { user: true } });
+            if (customer) {
+                const user = await prisma.user.findUnique({
+                    where: {
+                        id: customer.userId
+                    }, include: {
+                        account: true
+                    }
+                });
+                if (user) {
+                    const account = await prisma.account.findUnique({
+                        where: {
+                            id: user.account.id
+                        }
+                    });
+                    if (account) {
+                        const value = Number(account.balance) + Number(updatedPayment.value);
+                        const updatedAccount = await prisma.account.update({
+                            data: {
+                                balance: value
+                            },
+                            where: {
+                                id: account.id
+                            }
+                        })
+                    }
+                }
+            }
+
+        }
+
         return updatedPayment;
 
     }
