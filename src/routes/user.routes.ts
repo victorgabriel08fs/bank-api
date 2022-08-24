@@ -9,5 +9,6 @@ userRoutes.post("/", userController.create);
 userRoutes.get("/", userController.list);
 userRoutes.get("/:id", userController.find);
 userRoutes.delete("/:id", userController.delete);
+userRoutes.get("/balance/:id",userController.balance);
 
 export { userRoutes };

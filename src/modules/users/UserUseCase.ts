@@ -73,7 +73,7 @@ export class UserUseCase {
         return user;
     }
 
-    async balance({ id }: FindUserDTO): Promise<Number> {
+    async balance({ id }: FindUserDTO): Promise<any> {
         var balance:decimal = 0.0;
 
         const user = await prisma.user.findUnique({
@@ -106,7 +106,7 @@ export class UserUseCase {
             }
         })
 
-        return balance;
+        return {balance};
     }
 
 
