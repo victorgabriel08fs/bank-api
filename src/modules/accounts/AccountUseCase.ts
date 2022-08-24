@@ -2,6 +2,8 @@ import { CreateAccountDTO } from "./dtos/CreateAccountDTO";
 import { Account } from "@prisma/client";
 import { prisma } from "../../prisma/client";
 import { AppError } from "../../errors/AppError";
+import { FindUserDTO } from "./dtos/FindUserDTO";
+import { ChangeStatusDTO } from "./dtos/ChangeStatusDTO";
 
 export class AccountUseCase {
     async create({ userId }: CreateAccountDTO): Promise<Account> {
@@ -27,7 +29,7 @@ export class AccountUseCase {
         return account;
     }
 
-    async balance({ userId }) {
+    async balance({ userId }:FindUserDTO) {
         const user = await prisma.user.findUnique({
             where: {
                 id: userId
@@ -53,7 +55,7 @@ export class AccountUseCase {
         return { balance };
     }
 
-    async changeStatus({ id, status }) {
+    async changeStatus({ id, status }:ChangeStatusDTO) {
         const account = await prisma.account.findUnique({
             where: {
                 id

@@ -4,6 +4,7 @@ import { prisma } from "../../prisma/client";
 import { CreatePaymentDTO } from "./dtos/CreatePaymentDTO";
 import { DeletePaymentDTO } from "./dtos/DeletePaymentDTO";
 import { FindPaymentDTO } from "./dtos/FindPaymentDTO";
+import { ReportPaymentDTO } from "./dtos/ReportPaymentDTO";
 
 export class PaymentUseCase {
     async create({ customerId, value, billingType, dueDate }: CreatePaymentDTO): Promise<Payment> {
@@ -72,7 +73,7 @@ export class PaymentUseCase {
         return payment;
     }
 
-    async reportPayment({ id, status }): Promise<Payment> {
+    async reportPayment({ id, status }: ReportPaymentDTO): Promise<Payment> {
         const payment = await prisma.payment.findUnique({
             where: { id }
         });
@@ -81,7 +82,7 @@ export class PaymentUseCase {
             throw new AppError("Payment does not exists!");
         }
 
-        if(payment.status=="REVERSED"){
+        if (payment.status == "REVERSED") {
             throw new AppError("Payment is was reversed!");
         }
 
@@ -119,65 +120,83 @@ export class PaymentUseCase {
                 id
             }
         });
-
+        if (updatedPayment.customerId == null) {
+            throw new AppError("Customer does not exists");
+        }
         if (updatedPayment.status == "RECEIVED" || updatedPayment.status == "RECEIVED_OVERDUE") {
             const customer = await prisma.customer.findUnique({ where: { id: updatedPayment.customerId }, include: { user: true } });
-            if (customer) {
-                const user = await prisma.user.findUnique({
-                    where: {
-                        id: customer.userId
-                    }, include: {
-                        account: true
-                    }
-                });
-                if (user) {
-                    const account = await prisma.account.findUnique({
-                        where: {
-                            id: user.account.id
-                        }
-                    });
-                    if (account) {
-                        const value = Number(account.balance) + Number(updatedPayment.value);
-                        const updatedAccount = await prisma.account.update({
-                            data: {
-                                balance: value
-                            },
-                            where: {
-                                id: account.id
-                            }
-                        })
-                    }
+            if (!customer) {
+                throw new AppError("Customer does not exists");
+            }
+            if (customer.userId == null) {
+                throw new AppError("User does not exists");
+            }
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: customer.userId
+                }, include: {
+                    account: true
                 }
+            });
+            if (!user) {
+                throw new AppError("User does not exists");
+            }
+            if (user.account == null) {
+                throw new AppError("Account does not exists");
+            }
+            const account = await prisma.account.findUnique({
+                where: {
+                    id: user.account.id
+                }
+            });
+            if (account) {
+                const value = Number(account.balance) + Number(updatedPayment.value);
+                const updatedAccount = await prisma.account.update({
+                    data: {
+                        balance: value
+                    },
+                    where: {
+                        id: account.id
+                    }
+                })
             }
 
-        }else{
+        } else {
             const customer = await prisma.customer.findUnique({ where: { id: updatedPayment.customerId }, include: { user: true } });
-            if (customer) {
-                const user = await prisma.user.findUnique({
-                    where: {
-                        id: customer.userId
-                    }, include: {
-                        account: true
-                    }
-                });
-                if (user) {
-                    const account = await prisma.account.findUnique({
-                        where: {
-                            id: user.account.id
-                        }
-                    });
-                    if (account) {
-                        const value = Number(account.balance) - Number(updatedPayment.value);
-                        const updatedAccount = await prisma.account.update({
-                            data: {
-                                balance: value
-                            },
-                            where: {
-                                id: account.id
-                            }
-                        })
-                    }
+            if (!customer) {
+                throw new AppError("Customer does not exists");
+            }
+            if (customer.userId == null) {
+                throw new AppError("User does not exists");
+            }
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: customer.userId
+                }, include: {
+                    account: true
                 }
+            });
+            if (!user) {
+                throw new AppError("User does not exists");
+            }
+            if (user.account == null) {
+                throw new AppError("Account does not exists");
+            }
+            const account = await prisma.account.findUnique({
+                where: {
+                    id: user.account.id
+                }
+            });
+            if (account) {
+                const value = Number(account.balance) - Number(updatedPayment.value);
+                const updatedAccount = await prisma.account.update({
+                    data: {
+                        balance: value
+                    },
+                    where: {
+                        id: account.id
+                    }
+                })
             }
         }
 
