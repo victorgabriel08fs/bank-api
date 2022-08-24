@@ -26,4 +26,31 @@ export class AccountUseCase{
 
         return account;
     }
+
+    async balance({userId}){
+
+        const user = await prisma.user.findUnique({
+            where:{
+                id:userId
+            }
+        });
+
+        if(!user){
+            throw new AppError("User does not exists");
+        }
+
+        const account = await prisma.account.findFirst({
+            where:{
+                userId
+            }
+        });
+
+        if(!account){
+            throw new AppError("Account does not exists");
+        }
+
+        const balance = account.balance;
+
+        return {balance};
+    }
 }

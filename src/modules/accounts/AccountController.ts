@@ -11,4 +11,14 @@ export class AccountController {
 
         return res.status(201).json(result);
     }
+
+    async balance(req:Request,res:Response):Promise<any>{
+        const accountUseCase = new AccountUseCase();
+
+        const {userId} = req.params;
+
+        const result = await accountUseCase.balance({userId});
+
+        return res.status(200).json(result);
+    }
 }
