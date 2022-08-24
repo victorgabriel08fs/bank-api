@@ -81,27 +81,39 @@ export class PaymentUseCase {
             throw new AppError("Payment does not exists!");
         }
 
-        var s = "CANCELED";
-        var r = null;
+        if(payment.status=="REVERSED"){
+            throw new AppError("Payment is was reversed!");
+        }
+
+        if ((payment.status == "RECEIVED" || payment.status == "RECEIVED_OVERDUE") && status) {
+            throw new AppError("Payment is already received!");
+        }
+
+        var newStatus = "CANCELED";
+        var receivedDate = null;
 
         if (status) {
-            r = new Date();
+            receivedDate = new Date();
 
             switch (payment.status) {
                 case ("PENDING"):
-                    s = "RECEIVED";
+                    newStatus = "RECEIVED";
                     break;
                 case ("OVERDUE"):
-                    s = "RECEIVED_OVERDUE";
+                    newStatus = "RECEIVED_OVERDUE";
                     break;
             }
-            console.log(r);
+        } else {
+            if ("RECEIVED" || "RECEIVED_OVERDUE")
+                newStatus = "REVERSED"
         }
+
+
 
         const updatedPayment = await prisma.payment.update({
             data: {
-                status: s,
-                receivedDate: r
+                status: newStatus,
+                receivedDate: receivedDate
             },
             where: {
                 id
@@ -138,6 +150,35 @@ export class PaymentUseCase {
                 }
             }
 
+        }else{
+            const customer = await prisma.customer.findUnique({ where: { id: updatedPayment.customerId }, include: { user: true } });
+            if (customer) {
+                const user = await prisma.user.findUnique({
+                    where: {
+                        id: customer.userId
+                    }, include: {
+                        account: true
+                    }
+                });
+                if (user) {
+                    const account = await prisma.account.findUnique({
+                        where: {
+                            id: user.account.id
+                        }
+                    });
+                    if (account) {
+                        const value = Number(account.balance) - Number(updatedPayment.value);
+                        const updatedAccount = await prisma.account.update({
+                            data: {
+                                balance: value
+                            },
+                            where: {
+                                id: account.id
+                            }
+                        })
+                    }
+                }
+            }
         }
 
         return updatedPayment;
