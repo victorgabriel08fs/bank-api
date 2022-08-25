@@ -50,4 +50,14 @@ export class PaymentController {
         return res.status(200).json(result);
     }
 
+    async newDueDate(req: Request, res: Response): Promise<any> {
+        const paymentUseCase = new PaymentUseCase();
+
+        const { id } = req.body;
+
+        const result = await paymentUseCase.newDueDate({ id });
+
+        return res.status(200).json(result);
+    }
+
 }

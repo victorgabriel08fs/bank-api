@@ -9,6 +9,8 @@ paymentRoutes.post("/", paymentController.create);
 paymentRoutes.get("/", paymentController.list);
 paymentRoutes.get("/:id", paymentController.find);
 paymentRoutes.delete("/:id", paymentController.delete);
-paymentRoutes.patch("/reportPayment",paymentController.reportPayment);
+paymentRoutes.patch("/reportPayment", paymentController.reportPayment);
+paymentRoutes.patch("/newDueDate", paymentController.newDueDate);
+
 
 export { paymentRoutes };

@@ -1,9 +1,11 @@
 import { Payment } from "@prisma/client";
+import moment from "moment";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
 import { CreatePaymentDTO } from "./dtos/CreatePaymentDTO";
 import { DeletePaymentDTO } from "./dtos/DeletePaymentDTO";
 import { FindPaymentDTO } from "./dtos/FindPaymentDTO";
+import { NewDueDatePaymentDTO } from "./dtos/NewDueDatePaymentDTO";
 import { ReportPaymentDTO } from "./dtos/ReportPaymentDTO";
 
 export class PaymentUseCase {
@@ -199,6 +201,39 @@ export class PaymentUseCase {
                 })
             }
         }
+
+        return updatedPayment;
+
+    }
+
+    async newDueDate({ id }: NewDueDatePaymentDTO) {
+        const payment = await prisma.payment.findUnique({
+            where: { id }
+        });
+
+        if (!payment) {
+            throw new AppError("Payment does not exists!");
+        }
+        const todayDate = new Date();
+        const dif = moment(payment.updated_at).diff(todayDate, 'days');
+
+        if (payment.status != "OVERDUE" && (payment.status == "PENDING" && dif == 0)) {
+            throw new AppError("Payment cannot be postponed!");
+        }
+
+        const addDueDate = moment(todayDate).add(3, 'days');
+        const newDueDate = addDueDate.toDate();
+
+        const status = "PENDING";
+
+        const updatedPayment = await prisma.payment.update({
+            data: {
+                dueDate: newDueDate, status
+            },
+            where: {
+                id
+            }
+        });
 
         return updatedPayment;
 
