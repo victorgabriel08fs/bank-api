@@ -25,7 +25,7 @@ app.use((err: Error, request: Request, response: Response, next: NextFunction) =
 })
 
 app.listen(process.env.PORT, () => {
-    const interval = process.env.UPDATE_INTERVAL;
+    const interval = process.env.UPDATE_INTERVAL??1;
     console.log("Servidor rodando na porta " + process.env.PORT);
     setInterval(() => { const handleEvents = new HandleEvents(); handleEvents.execute(); }, Number(interval) * 1000);
 })
