@@ -5,9 +5,12 @@ import { routes } from './routes';
 import { AppError } from "./errors/AppError";
 import { HandleEvents } from "./events/HandleEvents";
 
+import cors from 'cors';
+
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/v1', routes);
 
@@ -25,7 +28,7 @@ app.use((err: Error, request: Request, response: Response, next: NextFunction) =
 })
 
 app.listen(process.env.PORT, () => {
-    const interval = process.env.UPDATE_INTERVAL??1;
+    const interval = process.env.UPDATE_INTERVAL ?? 1;
     console.log("Servidor rodando na porta " + process.env.PORT);
     setInterval(() => { const handleEvents = new HandleEvents(); handleEvents.execute(); }, Number(interval) * 1000);
 })
