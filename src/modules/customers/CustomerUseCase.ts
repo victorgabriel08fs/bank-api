@@ -1,4 +1,4 @@
-import { Customer } from "@prisma/client";
+import { Customer, Payment } from "@prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
 import { CreateCustomerDTO } from "./dtos/CreateCustomerDTO";
@@ -71,6 +71,23 @@ export class CustomerUseCase {
         }
 
         return customer;
+    }
+
+    async payments({ id }: FindCustomerDTO): Promise<Payment[]> {
+        const customer = await prisma.customer.findUnique({
+            where: {
+                id
+            }, include: {
+                payments: true,
+                user:true
+            }
+        });
+
+        if (!customer) {
+            throw new AppError("Customer does not exists");
+        }
+
+        return customer.payments;
     }
 
 }

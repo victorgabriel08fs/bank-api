@@ -8,6 +8,7 @@ const customerRoutes = Router();
 customerRoutes.post("/", customerController.create);
 customerRoutes.get("/", customerController.list);
 customerRoutes.get("/:id", customerController.find);
+customerRoutes.get("/:id/payments", customerController.payments);
 customerRoutes.delete("/:id", customerController.delete);
 
 export { customerRoutes };

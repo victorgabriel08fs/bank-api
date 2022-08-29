@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Customer, User } from "@prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../prisma/client";
 import { GenerateAccountData } from "../../services/GenerateAccountData";
@@ -26,15 +26,15 @@ export class UserUseCase {
         });
 
         const generateAccountData = new GenerateAccountData();
-        const {code,digit} = (await generateAccountData.execute());
+        const { code, digit } = (await generateAccountData.execute());
 
         const account = await prisma.account.create({
-            data:{
-                userId:user.id,code,digit
+            data: {
+                userId: user.id, code, digit
             }
         });
 
-        return {user,account};
+        return { user, account };
     }
 
     async delete({ id }: DeleteUserDTO): Promise<boolean> {
@@ -58,7 +58,12 @@ export class UserUseCase {
     }
 
     async list(): Promise<User[]> {
-        const users = await prisma.user.findMany();
+        const users = await prisma.user.findMany({
+            include: {
+                customers: true
+            }
+        });
+
 
         if (!users) {
             throw new AppError("Does not exists users!");
@@ -73,15 +78,31 @@ export class UserUseCase {
                 id
             }, include: {
                 customers: true,
-                account:true
+                account: true
             }
         });
 
         if (!user) {
             throw new AppError("User does not exists");
         }
-        
+
         return user;
     }
-    
+
+    async customers({ id }: FindUserDTO): Promise<Customer[]> {
+        const customers = await prisma.customer.findMany({
+            where: {
+                userId:id
+            }, include: {
+                payments: true,
+            }
+        });
+
+        if (!customers) {
+            throw new AppError("User does not exists");
+        }
+
+        return customers;
+    }
+
 }

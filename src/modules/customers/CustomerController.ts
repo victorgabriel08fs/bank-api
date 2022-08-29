@@ -40,4 +40,14 @@ export class CustomerController {
         return res.status(200).json(result);
     }
 
+    async payments(req: Request, res: Response): Promise<any> {
+        const customerUseCase = new CustomerUseCase();
+
+        const { id } = req.params;
+
+        const result = await customerUseCase.payments({ id });
+
+        return res.status(200).json(result);
+    }
+
 }
