@@ -74,9 +74,9 @@ export class HandleEvents {
         });
         const rateUseCase = new RateUseCase();
         const rate = await rateUseCase.getLast();
-        if (rate&&rate.status) {
+        if (rate && rate.status) {
             accounts.map(async (account) => {
-                const value = Number(account.balance) + (Number(rate.value) * (Number(account.balance)));
+                const value = Number(account.balance) + ((Number(rate.value) * (Number(account.balance))));
                 await prisma.account.update({
                     data: {
                         balance: value
