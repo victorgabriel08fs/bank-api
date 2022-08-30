@@ -60,7 +60,8 @@ export class UserUseCase {
     async list(): Promise<User[]> {
         const users = await prisma.user.findMany({
             include: {
-                customers: true
+                customers: true,
+                account: true
             }
         });
 
@@ -92,7 +93,7 @@ export class UserUseCase {
     async customers({ id }: FindUserDTO): Promise<Customer[]> {
         const customers = await prisma.customer.findMany({
             where: {
-                userId:id
+                userId: id
             }, include: {
                 payments: true,
             }
