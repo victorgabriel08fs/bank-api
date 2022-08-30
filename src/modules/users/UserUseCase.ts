@@ -106,4 +106,18 @@ export class UserUseCase {
         return customers;
     }
 
+    async count(): Promise<any> {
+        var count;
+
+        const users = await prisma.user.count();
+
+        if (!users) {
+            throw new AppError("Users does not exists");
+        }
+
+        count = users;
+
+        return { count };
+    }
+
 }
